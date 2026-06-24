@@ -50,15 +50,23 @@ IAM Policies - allow API call for a specific user
 
 ## RDS
 
+### ElasticCache
+Helps reduce load of databases for *read* intensive workloads
+
+1. **Memcache**
+    - 
+2. **Redis**
 
 
 ### Monitoring
+* `DatabaseConnections`
+* `SwapUsage`
+* `ReadLatency` / `WriteLatency`
+* `FreeStorageMetric` monitor the available storage space for an RDS DB instance
 
-* `FreeStorageMetric` metric to monitor the available storage space for an RDS DB instance
+* `FreeableMemory` tracks the amount of available random access memory
 
-* `FreeableMemory` metric tracks the amount of available random access memory
-
-* `DiskQueueDepth` metric provides the number of outstanding IOs (read/write requests) waiting to access the disk.
+* `DiskQueueDepth` provides the number of outstanding IOs (read/write requests) waiting to access the disk.
 
 * `BinLogDiskUsage` metric tracks the amount of disk space occupied by binary logs on the master. This only applies to MySQL read replicas.
 
@@ -75,6 +83,16 @@ Detailed Monitoring:
 Test Alarm :
 
     aws cloudwatch set-alarm-state --alarm-name "myalarm" --state-value ALARM --state-reason "testing purposes"
+
+### Cutom Metrics
+- E.g.: RAM, Disk Space, Number of Logged users
+- Use API call **PutMetricData**
+- Metric Resolution (Storage Resolution)
+    - Standard: 1 minute or 60 seconds
+    - High Resolution: 1,5,10,30 seconds **(Higher Cost)**
+
+### Anomaly Detection
+Continuously analyze metrics to determine normal baselines and surface anomalies using Machine Learning algorithms
 
 ---
 
@@ -197,3 +215,24 @@ Multi Region
 ---
 
 ## CodeBuild
+
+- Build Instructions: 
+    - **buildspec.yml** (must at the root of your code)
+    - or insert manually in console
+- Output logs can be stored in S3 or CloudWatch logs
+- Build Projects can be defined within CodePipeline or CodeBuild
+
+### buildspec.yml
+- env - defined environment variables
+    - variables - plaintext
+    - parameter-store - variables stored in SSM Parameter Store
+    - secrets-manager - variables stored in AWS Secret Manager
+- phases:
+    - **install** - install dependencies you may need for your build
+    - **pre_build** - final commands to execute before build
+    - **build** - actual build commands
+    - **post_build** - finishing touches (e.g.z zip output)
+    - **artifacts** - what to upload to S3
+    - **cache** - files to cache (dependencies) to S3 build speed
+
+    ![alt text](image-13.png)
